@@ -1,0 +1,23 @@
+# Build artifacts
+build/
+dist/
+*.spec.bak
+
+# PyInstaller
+*.manifest
+
+# User-specific runtime config (contains local file paths)
+bo3_launcher_config.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS/editor cruft
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
