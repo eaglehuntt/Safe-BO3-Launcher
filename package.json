@@ -1,0 +1,51 @@
+{
+  "name": "safe-bo3-launcher",
+  "productName": "Safe BO3 Launcher",
+  "version": "2.0.0",
+  "description": "Launches the T7 patch and confirms it's running before starting Black Ops 3.",
+  "author": "eaglehuntt",
+  "homepage": "https://github.com/eaglehuntt/Safe-BO3-Launcher",
+  "main": "./out/main/index.js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "dist:win": "npm run build && electron-builder --win"
+  },
+  "dependencies": {
+    "framer-motion": "^12.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^3.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11"
+  },
+  "build": {
+    "appId": "com.eaglehuntt.safebo3launcher",
+    "productName": "Safe BO3 Launcher",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

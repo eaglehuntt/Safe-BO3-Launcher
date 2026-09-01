@@ -1,0 +1,24 @@
+.app-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  z-index: 1;
+}
+
+.app-shell__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: blur(6px);
+}
+
+.app-shell__header-actions {
+  padding-right: 24px;
+}
+
+.app-shell__content {
+  flex: 1;
+  overflow-y: auto;
+}

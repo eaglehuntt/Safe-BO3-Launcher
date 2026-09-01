@@ -1,0 +1,129 @@
+:root {
+  --bg-void: #08070a;
+  --bg-panel: #131114;
+  --bg-panel-raised: #1a171b;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 145, 90, 0.35);
+
+  --text-primary: #f3ede8;
+  --text-secondary: #a8a09c;
+  --text-tertiary: #6b6560;
+
+  --accent-orange: #ff7a3d;
+  --accent-red: #e8352a;
+  --accent-amber: #ffb454;
+  --accent-cyan: #4dd9e8;
+
+  --gradient-brand: linear-gradient(120deg, #ffb454 0%, #ff7a3d 40%, #e8352a 100%);
+  --gradient-brand-soft: linear-gradient(120deg, rgba(255, 180, 84, 0.16), rgba(232, 53, 42, 0.16));
+  --gradient-panel: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+
+  --shadow-glow: 0 0 40px rgba(255, 122, 61, 0.25);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --font-display: 'Bahnschrift', 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Cascadia Mono', 'Consolas', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow: hidden;
+  user-select: none;
+}
+
+input,
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: rgba(255, 122, 61, 0.35);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 122, 61, 0.4);
+}
+
+.app-region-drag {
+  -webkit-app-region: drag;
+}
+
+.app-region-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+@keyframes streak-pulse {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scaleY(0.92);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 24px rgba(255, 122, 61, 0.25), 0 0 0 rgba(232, 53, 42, 0);
+  }
+  50% {
+    box-shadow: 0 0 46px rgba(255, 122, 61, 0.5), 0 0 20px rgba(232, 53, 42, 0.25);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ember-drift {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-140px) translateX(var(--drift-x, 12px));
+    opacity: 0;
+  }
+}

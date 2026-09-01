@@ -1,13 +1,18 @@
-# Build artifacts
-build/
-dist/
-*.spec.bak
+# Node / Electron build artifacts
+node_modules/
+out/
+release/
+*.tsbuildinfo
 
-# PyInstaller
+# Legacy PyInstaller build artifacts
+legacy-python/build/
+legacy-python/dist/
+*.spec.bak
 *.manifest
 
 # User-specific runtime config (contains local file paths)
 bo3_launcher_config.json
+settings.json
 
 # Python
 __pycache__/
@@ -21,3 +26,7 @@ venv/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Logs
+*.log
+npm-debug.log*
