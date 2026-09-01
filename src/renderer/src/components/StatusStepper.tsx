@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import type { LaunchStep } from '@shared/types'
 import './StatusStepper.css'
 
@@ -52,23 +51,18 @@ export default function StatusStepper({ step }: StatusStepperProps): React.JSX.E
         <div className="stepper__stage" key={stage.id}>
           <div className={`stepper__node stepper__node--${statuses[index]}`}>
             {statuses[index] === 'done' && (
-              <motion.svg
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.35 }}
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-              >
-                <motion.path
+              <svg viewBox="0 0 24 24" width="14" height="14">
+                <path
+                  className="stepper__check"
                   d="M5 12.5 L10 17 L19 7"
                   fill="none"
                   stroke="#140b06"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  pathLength="1"
                 />
-              </motion.svg>
+              </svg>
             )}
             {statuses[index] === 'active' && <span className="stepper__pulse" />}
             {statuses[index] === 'error' && <span className="stepper__error">!</span>}

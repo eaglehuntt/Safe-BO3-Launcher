@@ -1,6 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC } from '../shared/types'
-import type { LaunchProgressEvent, LaunchResult, LauncherSettings } from '../shared/types'
+import type {
+  LaunchProgressEvent,
+  LaunchResult,
+  LauncherSettings,
+  T7UpdateStatus
+} from '../shared/types'
 
 const api = {
   getSettings: (): Promise<LauncherSettings> => ipcRenderer.invoke(IPC.GetSettings),
@@ -18,6 +23,8 @@ const api = {
   openExternal: (url: string): Promise<void> => ipcRenderer.invoke(IPC.OpenExternal, url),
 
   getAppVersion: (): Promise<string> => ipcRenderer.invoke(IPC.GetAppVersion),
+
+  checkT7Update: (): Promise<T7UpdateStatus> => ipcRenderer.invoke(IPC.CheckT7Update),
 
   onLaunchProgress: (callback: (event: LaunchProgressEvent) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, payload: LaunchProgressEvent): void =>

@@ -41,7 +41,7 @@ export async function runLaunchSequence(
     if (alreadyRunning) {
       emit(window, {
         step: 't7-already-running',
-        message: 'T7 patch is already running — skipping duplicate launch.'
+        message: 'T7 patch is already running, skipping duplicate launch.'
       })
     } else {
       emit(window, { step: 'launching-t7', message: 'Launching T7 patch...' })

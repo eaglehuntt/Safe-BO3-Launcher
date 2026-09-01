@@ -54,6 +54,18 @@
   animation: glow-pulse 1.4s ease-in-out infinite;
 }
 
+.stepper__check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: check-draw 0.4s ease-out forwards;
+}
+
+@keyframes check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .stepper__error {
   color: var(--accent-red);
   font-weight: 800;

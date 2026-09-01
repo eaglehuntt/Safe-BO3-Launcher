@@ -23,6 +23,12 @@ export interface LaunchResult {
   message: string
 }
 
+export interface T7UpdateStatus {
+  updateAvailable: boolean
+  latestLabel: string | null
+  releaseUrl: string
+}
+
 export const IPC = {
   GetSettings: 'settings:get',
   SaveSettings: 'settings:save',
@@ -31,5 +37,6 @@ export const IPC = {
   StartLaunch: 'launch:start',
   LaunchProgress: 'launch:progress',
   OpenExternal: 'shell:openExternal',
-  GetAppVersion: 'app:getVersion'
+  GetAppVersion: 'app:getVersion',
+  CheckT7Update: 'update:checkT7'
 } as const

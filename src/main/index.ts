@@ -5,11 +5,21 @@ import type { LauncherSettings } from '../shared/types'
 import { runLaunchSequence } from './launchSequence'
 import { loadSettings, saveSettings } from './settings'
 import { detectBlackOps3Path } from './steamDetect'
+import { checkT7Update } from './t7UpdateCheck'
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
 if (!gotSingleInstanceLock) {
   app.quit()
 }
+
+// Windows' native window-occlusion tracking can misdetect this window as
+// covered/inactive and throttle its repaints, leaving stale content on
+// screen. Disabling it keeps the renderer painting normally at all times.
+app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion')
+
+process.on('uncaughtException', (error) => {
+  console.log(`[main] uncaughtException: ${error.stack ?? error.message}`)
+})
 
 let mainWindow: BrowserWindow | null = null
 
@@ -44,6 +54,10 @@ function createWindow(): void {
       mainWindow.show()
     }
   }, 2500)
+
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.log(`[main] renderer process gone: ${JSON.stringify(details)}`)
+  })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -100,6 +114,14 @@ function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IPC.GetAppVersion, () => app.getVersion())
+
+  ipcMain.handle(IPC.CheckT7Update, () => {
+    const settings = loadSettings()
+    if (!settings.t7PatchPath) {
+      return { updateAvailable: false, latestLabel: null, releaseUrl: '' }
+    }
+    return checkT7Update(settings.t7PatchPath)
+  })
 }
 
 app.whenReady().then(() => {

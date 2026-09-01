@@ -26,6 +26,7 @@ venv/
 .idea/
 Thumbs.db
 .DS_Store
+.claude/
 
 # Logs
 *.log

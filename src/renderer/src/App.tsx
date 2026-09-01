@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import type { LauncherSettings } from '@shared/types'
 import BackgroundFX from './components/BackgroundFX'
@@ -46,23 +45,15 @@ export default function App(): React.JSX.Element {
 
       <main className="app-shell__content">
         {ready && (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeView}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.22 }}
-            >
-              {activeView === 'launch' && (
-                <LaunchView settings={settings} onGoToSetup={() => setActiveView('setup')} />
-              )}
-              {activeView === 'setup' && (
-                <SetupView settings={settings} onSettingsSaved={setSettings} />
-              )}
-              {activeView === 'safety' && <SafetyView />}
-            </motion.div>
-          </AnimatePresence>
+          <div key={activeView} className="fade-in">
+            {activeView === 'launch' && (
+              <LaunchView settings={settings} onGoToSetup={() => setActiveView('setup')} />
+            )}
+            {activeView === 'setup' && (
+              <SetupView settings={settings} onSettingsSaved={setSettings} />
+            )}
+            {activeView === 'safety' && <SafetyView />}
+          </div>
         )}
       </main>
     </div>

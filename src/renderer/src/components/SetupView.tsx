@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import type { LauncherSettings } from '@shared/types'
 import Button from './Button'
@@ -52,10 +51,10 @@ export default function SetupView({ settings, onSettingsSaved }: SetupViewProps)
 
   return (
     <div className="setup-view">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+      <div className="fade-in">
         <h2 className="setup-view__heading">Configure your paths</h2>
         <p className="setup-view__subheading">
-          It doesn&apos;t matter where the T7 patch lives on disk — just point us at it once.
+          It doesn&apos;t matter where the T7 patch lives on disk, just point us at it once.
         </p>
 
         <div className="setup-view__field">
@@ -98,10 +97,10 @@ export default function SetupView({ settings, onSettingsSaved }: SetupViewProps)
             <Button variant="ghost" onClick={autoDetectBo3} disabled={detectStatus === 'detecting'}>
               {detectStatus === 'detecting' ? 'Searching Steam libraries...' : 'Auto-detect via Steam'}
             </Button>
-            {detectStatus === 'found' && <span className="setup-view__detect-msg is-good">Found it.</span>}
+            {detectStatus === 'found' && <span className="setup-view__detect-msg is-good">Found</span>}
             {detectStatus === 'not-found' && (
               <span className="setup-view__detect-msg is-bad">
-                Couldn&apos;t find it automatically — browse manually above.
+                Couldn&apos;t find it automatically, browse manually above.
               </span>
             )}
           </div>
@@ -113,18 +112,13 @@ export default function SetupView({ settings, onSettingsSaved }: SetupViewProps)
           </Button>
           {saveState === 'saved' && <span className="setup-view__saved-msg">Saved.</span>}
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div
-        className="setup-view__instructions"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1, duration: 0.35 }}
-      >
+      <div className="setup-view__instructions fade-in">
         <h3 className="setup-view__instructions-title">Getting the T7 patch</h3>
         <ol className="setup-view__steps">
           <li>Grab the latest release from the community T7 Patch repo.</li>
-          <li>Extract it anywhere you like — the folder location doesn&apos;t matter to us.</li>
+          <li>Extract it anywhere you like, the folder location doesn&apos;t matter to us.</li>
           <li>Come back here and browse to the patch&apos;s .exe above.</li>
           <li>Point us at BlackOps3.exe, or let auto-detect find it via Steam.</li>
           <li>Save, then head to the Launch tab.</li>
@@ -132,7 +126,7 @@ export default function SetupView({ settings, onSettingsSaved }: SetupViewProps)
         <Button variant="outline" onClick={() => window.api.openExternal(T7_PATCH_REPO_URL)}>
           Open the T7 Patch repo ↗
         </Button>
-      </motion.div>
+      </div>
     </div>
   )
 }
