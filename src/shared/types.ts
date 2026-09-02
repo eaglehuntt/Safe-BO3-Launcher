@@ -23,7 +23,7 @@ export interface LaunchResult {
   message: string
 }
 
-export interface T7UpdateStatus {
+export interface UpdateStatus {
   updateAvailable: boolean
   latestLabel: string | null
   releaseUrl: string
@@ -38,5 +38,6 @@ export const IPC = {
   LaunchProgress: 'launch:progress',
   OpenExternal: 'shell:openExternal',
   GetAppVersion: 'app:getVersion',
-  CheckT7Update: 'update:checkT7'
+  CheckT7Update: 'update:checkT7',
+  CheckAppUpdate: 'update:checkApp'
 } as const

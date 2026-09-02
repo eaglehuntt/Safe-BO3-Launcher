@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { LaunchProgressEvent, LauncherSettings, T7UpdateStatus } from '@shared/types'
+import type { LaunchProgressEvent, LauncherSettings, UpdateStatus } from '@shared/types'
 import { GAMES } from '../data/games'
 import Button from './Button'
 import GameSelector from './GameSelector'
@@ -8,6 +8,7 @@ import './LaunchView.css'
 
 interface LaunchViewProps {
   settings: LauncherSettings
+  updateStatus: UpdateStatus | null
   onGoToSetup: () => void
 }
 
@@ -15,11 +16,14 @@ function basename(path: string): string {
   return path.split(/[\\/]/).pop() ?? path
 }
 
-export default function LaunchView({ settings, onGoToSetup }: LaunchViewProps): React.JSX.Element {
+export default function LaunchView({
+  settings,
+  updateStatus,
+  onGoToSetup
+}: LaunchViewProps): React.JSX.Element {
   const [progress, setProgress] = useState<LaunchProgressEvent | null>(null)
   const [isLaunching, setIsLaunching] = useState(false)
   const [gameIndex, setGameIndex] = useState(0)
-  const [updateStatus, setUpdateStatus] = useState<T7UpdateStatus | null>(null)
 
   const game = GAMES[gameIndex]
   const isConfigured = Boolean(settings.t7PatchPath && settings.bo3Path)
@@ -30,14 +34,6 @@ export default function LaunchView({ settings, onGoToSetup }: LaunchViewProps): 
     })
     return unsubscribe
   }, [])
-
-  useEffect(() => {
-    if (game.status !== 'available' || !settings.t7PatchPath) {
-      setUpdateStatus(null)
-      return
-    }
-    window.api.checkT7Update().then(setUpdateStatus)
-  }, [game.status, settings.t7PatchPath])
 
   async function handleLaunch(): Promise<void> {
     setProgress(null)

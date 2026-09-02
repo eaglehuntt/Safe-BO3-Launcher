@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { LauncherSettings } from '@shared/types'
+import type { LauncherSettings, UpdateStatus } from '@shared/types'
 import BackgroundFX from './components/BackgroundFX'
 import Button from './components/Button'
 import LaunchView from './components/LaunchView'
@@ -16,6 +16,8 @@ export default function App(): React.JSX.Element {
   const [settings, setSettings] = useState<LauncherSettings>(EMPTY_SETTINGS)
   const [version, setVersion] = useState('2.0.0')
   const [ready, setReady] = useState(false)
+  const [t7UpdateStatus, setT7UpdateStatus] = useState<UpdateStatus | null>(null)
+  const [appUpdateStatus, setAppUpdateStatus] = useState<UpdateStatus | null>(null)
 
   useEffect(() => {
     Promise.all([window.api.getSettings(), window.api.getAppVersion()]).then(
@@ -26,6 +28,10 @@ export default function App(): React.JSX.Element {
         if (!loadedSettings.t7PatchPath || !loadedSettings.bo3Path) {
           setActiveView('setup')
         }
+        if (loadedSettings.t7PatchPath) {
+          window.api.checkT7Update().then(setT7UpdateStatus)
+        }
+        window.api.checkAppUpdate().then(setAppUpdateStatus)
       }
     )
   }, [])
@@ -37,6 +43,14 @@ export default function App(): React.JSX.Element {
       <header className="app-shell__header app-region-drag">
         <NavTabs active={activeView} onChange={setActiveView} />
         <div className="app-shell__header-actions app-region-no-drag">
+          {appUpdateStatus?.updateAvailable && (
+            <button
+              className="app-shell__update-pill"
+              onClick={() => window.api.openExternal(appUpdateStatus.releaseUrl)}
+            >
+              Update available
+            </button>
+          )}
           <Button variant="ghost" onClick={() => window.api.openExternal('https://github.com/eaglehuntt/Safe-BO3-Launcher')}>
             GitHub ↗
           </Button>
@@ -47,7 +61,11 @@ export default function App(): React.JSX.Element {
         {ready && (
           <div key={activeView} className="fade-in">
             {activeView === 'launch' && (
-              <LaunchView settings={settings} onGoToSetup={() => setActiveView('setup')} />
+              <LaunchView
+                settings={settings}
+                updateStatus={t7UpdateStatus}
+                onGoToSetup={() => setActiveView('setup')}
+              />
             )}
             {activeView === 'setup' && (
               <SetupView settings={settings} onSettingsSaved={setSettings} />

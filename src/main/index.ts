@@ -6,6 +6,7 @@ import { runLaunchSequence } from './launchSequence'
 import { loadSettings, saveSettings } from './settings'
 import { detectBlackOps3Path } from './steamDetect'
 import { checkT7Update } from './t7UpdateCheck'
+import { checkAppUpdate } from './appUpdateCheck'
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
 if (!gotSingleInstanceLock) {
@@ -27,8 +28,8 @@ function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1180,
     height: 760,
-    minWidth: 960,
-    minHeight: 640,
+    resizable: false,
+    maximizable: false,
     show: false,
     autoHideMenuBar: true,
     backgroundColor: '#0a0908',
@@ -122,6 +123,8 @@ function registerIpcHandlers(): void {
     }
     return checkT7Update(settings.t7PatchPath)
   })
+
+  ipcMain.handle(IPC.CheckAppUpdate, () => checkAppUpdate(app.getVersion()))
 }
 
 app.whenReady().then(() => {

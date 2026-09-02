@@ -28,6 +28,9 @@ If the patch doesn't come up within 30 seconds, BO3 is never launched and you're
 - Built-in Setup tab with install instructions and a direct link to the [T7 Patch repo](https://github.com/Scroptss/T7Patch).
 - Built-in Safety Guide summarizing community guidance on playing safely (lobby passwords, hiding your Steam profile, etc.), with a link to the source thread.
 - Paths are saved locally next to the app — set them up once.
+- Checks the [T7Patch repo](https://github.com/Scroptss/T7Patch)'s release feed on launch and flags it if a newer build is out.
+- Checks its own GitHub releases on launch too, so a new version of the launcher itself is easy to notice.
+- Fixed-size window (no accidental resizing/maximizing).
 
 ## Getting started
 
@@ -42,14 +45,16 @@ npm run dev
 
 Requires Node.js 20+ on Windows.
 
-### Option 2 — build a portable exe
+### Option 2 — build the installer
 
 ```bash
 npm install
 npm run dist:win
 ```
 
-The installer lands in `release/`.
+Produces `release/Safe BO3 Launcher Setup <version>.exe` (NSIS installer, lets you pick the install location, adds a Start Menu shortcut).
+
+> **Note:** building the installer on Windows requires **Developer Mode** enabled (Settings → Privacy & security → For developers). Without it, `electron-builder` can't extract one of its helper toolchains (it contains symlinks, which Windows blocks for non-admin accounts unless Developer Mode is on).
 
 ## Usage
 
@@ -68,6 +73,10 @@ The launcher will:
 ## Configuration
 
 Paths are stored in a `settings.json` file in the app's user-data directory. This is machine-specific and intentionally excluded from version control.
+
+## Shipping an update
+
+Bump `version` in `package.json`, build the installer (`npm run dist:win`), then publish a [GitHub release](https://github.com/eaglehuntt/Safe-BO3-Launcher/releases/new) tagged `vX.Y.Z` with that installer attached. Installed copies check the release feed on launch and show an "Update available" pill once the tag is newer than their running version — clicking it opens the release page to download.
 
 ## Project structure
 

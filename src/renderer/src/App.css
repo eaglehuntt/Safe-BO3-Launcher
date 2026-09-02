@@ -16,7 +16,30 @@
 }
 
 .app-shell__header-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   padding-right: 24px;
+}
+
+.app-shell__update-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 122, 61, 0.1);
+  color: var(--accent-amber);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.app-shell__update-pill:hover {
+  background: rgba(255, 122, 61, 0.16);
 }
 
 .app-shell__content {

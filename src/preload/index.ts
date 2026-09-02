@@ -4,7 +4,7 @@ import type {
   LaunchProgressEvent,
   LaunchResult,
   LauncherSettings,
-  T7UpdateStatus
+  UpdateStatus
 } from '../shared/types'
 
 const api = {
@@ -24,7 +24,9 @@ const api = {
 
   getAppVersion: (): Promise<string> => ipcRenderer.invoke(IPC.GetAppVersion),
 
-  checkT7Update: (): Promise<T7UpdateStatus> => ipcRenderer.invoke(IPC.CheckT7Update),
+  checkT7Update: (): Promise<UpdateStatus> => ipcRenderer.invoke(IPC.CheckT7Update),
+
+  checkAppUpdate: (): Promise<UpdateStatus> => ipcRenderer.invoke(IPC.CheckAppUpdate),
 
   onLaunchProgress: (callback: (event: LaunchProgressEvent) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, payload: LaunchProgressEvent): void =>
