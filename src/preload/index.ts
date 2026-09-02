@@ -31,6 +31,9 @@ const api = {
 
   checkAppUpdate: (): Promise<UpdateStatus> => ipcRenderer.invoke(IPC.CheckAppUpdate),
 
+  isProcessRunning: (exePath: string): Promise<boolean> =>
+    ipcRenderer.invoke(IPC.IsProcessRunning, exePath),
+
   onLaunchProgress: (callback: (event: LaunchProgressEvent) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, payload: LaunchProgressEvent): void =>
       callback(payload)

@@ -3,22 +3,48 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 40px 32px 32px;
-  max-width: 720px;
-  margin: 0 auto;
+  padding: 20px 32px 32px;
 }
 
 .launch-view__hero {
   position: relative;
+  width: 100%;
+  max-width: 900px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.launch-view__hero-art {
+  display: block;
+  width: 100%;
+}
+
+.launch-view__hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(8, 7, 10, 0.96) 0%,
+    rgba(8, 7, 10, 0.6) 42%,
+    rgba(8, 7, 10, 0.15) 100%
+  );
+}
+
+.launch-view__hero-content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 28px 32px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 36px;
 }
 
 .launch-view__big {
   font-family: var(--font-display);
-  font-size: 88px;
+  font-size: 72px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -49,6 +75,7 @@
 .launch-view__card {
   position: relative;
   width: 100%;
+  max-width: 720px;
   background: var(--gradient-panel), var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
@@ -104,11 +131,26 @@
 }
 
 .launch-view__path-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-tertiary);
+}
+
+.launch-view__running-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px 1px 5px;
+  border-radius: 999px;
+  background: rgba(84, 214, 138, 0.15);
+  color: #6ee7a0;
+  font-size: 9px;
+  letter-spacing: 0.06em;
 }
 
 .launch-view__path-value {

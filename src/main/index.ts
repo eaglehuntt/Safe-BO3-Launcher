@@ -6,6 +6,7 @@ import { getGameDefinition } from '../shared/gameDefinitions'
 import { runLaunchSequence } from './launchSequence'
 import { loadSettings, saveSettings } from './settings'
 import { detectGameInstallPath } from './steamDetect'
+import { isProcessRunning } from './processUtils'
 import { checkToolUpdate } from './toolUpdateCheck'
 import { checkAppUpdate } from './appUpdateCheck'
 
@@ -131,6 +132,8 @@ function registerIpcHandlers(): void {
   )
 
   ipcMain.handle(IPC.CheckAppUpdate, () => checkAppUpdate(app.getVersion()))
+
+  ipcMain.handle(IPC.IsProcessRunning, (_event, exePath: string) => isProcessRunning(exePath))
 }
 
 app.whenReady().then(() => {

@@ -6,7 +6,7 @@ import './GameOnboarding.css'
 interface GameOnboardingProps {
   game: GameDefinition
   onComplete: (gamePath: string, toolPath?: string) => void
-  onCancel: () => void
+  onCancel?: () => void
 }
 
 type DetectStatus = 'idle' | 'detecting' | 'found' | 'not-found'
@@ -58,7 +58,7 @@ export default function GameOnboarding({ game, onComplete, onCancel }: GameOnboa
 
   function goBack(): void {
     if (isFirst) {
-      onCancel()
+      onCancel?.()
       return
     }
     setStepIndex((index) => index - 1)
@@ -170,9 +170,13 @@ export default function GameOnboarding({ game, onComplete, onCancel }: GameOnboa
       )}
 
       <div className="onboarding__nav">
-        <Button variant="ghost" onClick={goBack}>
-          {isFirst ? 'Cancel' : '← Back'}
-        </Button>
+        {!isFirst || onCancel ? (
+          <Button variant="ghost" onClick={goBack}>
+            {isFirst ? 'Cancel' : '← Back'}
+          </Button>
+        ) : (
+          <span />
+        )}
         <Button onClick={goNext} disabled={!canProceed}>
           {isLast ? 'Finish' : 'Next'}
         </Button>

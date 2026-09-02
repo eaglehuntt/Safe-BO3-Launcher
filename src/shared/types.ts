@@ -45,5 +45,6 @@ export const IPC = {
   OpenExternal: 'shell:openExternal',
   GetAppVersion: 'app:getVersion',
   CheckToolUpdate: 'update:checkTool',
-  CheckAppUpdate: 'update:checkApp'
+  CheckAppUpdate: 'update:checkApp',
+  IsProcessRunning: 'process:isRunning'
 } as const

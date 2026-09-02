@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import type { LauncherSettings, LibraryEntry, UpdateStatus } from '@shared/types'
-import { getGameDefinition } from '@shared/gameDefinitions'
+import { GAME_CATALOG } from '@shared/gameDefinitions'
 import BackgroundFX from './components/BackgroundFX'
 import Button from './components/Button'
 import GameOnboarding from './components/GameOnboarding'
 import LaunchView from './components/LaunchView'
-import LibraryView from './components/LibraryView'
 import NavTabs, { type ViewId } from './components/NavTabs'
 import SafetyView from './components/SafetyView'
 import SetupView from './components/SetupView'
@@ -14,11 +13,16 @@ import './App.css'
 
 const EMPTY_SETTINGS: LauncherSettings = { library: [] }
 
-type Screen = 'library' | 'game' | 'onboarding'
+// Only one game is wired up right now, so the app opens straight into it
+// rather than a library grid. GAME_CATALOG staying a list (and everything
+// downstream being keyed off gameId) means adding a second game back later
+// is just a new catalog entry, not a rewrite.
+const PRIMARY_GAME = GAME_CATALOG[0]
+
+type Screen = 'game' | 'onboarding'
 
 export default function App(): React.JSX.Element {
-  const [screen, setScreen] = useState<Screen>('library')
-  const [activeGameId, setActiveGameId] = useState<string | null>(null)
+  const [screen, setScreen] = useState<Screen>('onboarding')
   const [activeTab, setActiveTab] = useState<ViewId>('launch')
   const [settings, setSettings] = useState<LauncherSettings>(EMPTY_SETTINGS)
   const [version, setVersion] = useState('2.0.0')
@@ -32,34 +36,23 @@ export default function App(): React.JSX.Element {
         setSettings(loadedSettings)
         setVersion(appVersion)
         setReady(true)
+        const entry = loadedSettings.library.find((item) => item.gameId === PRIMARY_GAME.id)
+        setScreen(entry?.gamePath ? 'game' : 'onboarding')
         window.api.checkAppUpdate().then(setAppUpdateStatus)
       }
     )
   }, [])
 
-  const activeEntry = settings.library.find((item) => item.gameId === activeGameId) ?? null
-  const activeGame = activeGameId ? getGameDefinition(activeGameId) : null
+  const activeEntry = settings.library.find((item) => item.gameId === PRIMARY_GAME.id) ?? null
 
   useEffect(() => {
-    if (!activeEntry || !activeGame?.safetyTool || !activeEntry.toolPath) {
+    if (!activeEntry || !PRIMARY_GAME.safetyTool || !activeEntry.toolPath) {
       setToolUpdateStatus(null)
       return
     }
-    window.api.checkToolUpdate(activeEntry.toolPath, activeGame.safetyTool.repoUrl).then(setToolUpdateStatus)
+    window.api.checkToolUpdate(activeEntry.toolPath, PRIMARY_GAME.safetyTool.repoUrl).then(setToolUpdateStatus)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeEntry?.toolPath])
-
-  function openLibrary(): void {
-    setScreen('library')
-    setActiveGameId(null)
-  }
-
-  function handleSelectGame(gameId: string): void {
-    const isConfigured = settings.library.some((entry) => entry.gameId === gameId && entry.gamePath)
-    setActiveGameId(gameId)
-    setActiveTab('launch')
-    setScreen(isConfigured ? 'game' : 'onboarding')
-  }
 
   async function persistLibrary(library: LibraryEntry[]): Promise<void> {
     const saved = await window.api.saveSettings({ ...settings, library })
@@ -67,9 +60,13 @@ export default function App(): React.JSX.Element {
   }
 
   async function handleOnboardingComplete(gamePath: string, toolPath?: string): Promise<void> {
-    if (!activeGameId) return
-    const entry: LibraryEntry = { gameId: activeGameId, gamePath, toolPath, addedAt: new Date().toISOString() }
-    const withoutExisting = settings.library.filter((item) => item.gameId !== activeGameId)
+    const entry: LibraryEntry = {
+      gameId: PRIMARY_GAME.id,
+      gamePath,
+      toolPath,
+      addedAt: new Date().toISOString()
+    }
+    const withoutExisting = settings.library.filter((item) => item.gameId !== PRIMARY_GAME.id)
     await persistLibrary([...withoutExisting, entry])
     setActiveTab('launch')
     setScreen('game')
@@ -83,10 +80,10 @@ export default function App(): React.JSX.Element {
   return (
     <div className="app-shell">
       <BackgroundFX />
-      <TitleBar version={version} onOpenLibrary={openLibrary} />
+      <TitleBar version={version} onOpenLibrary={() => setActiveTab('launch')} />
       <header className="app-shell__header app-region-drag">
-        {screen === 'game' && activeGame && (
-          <NavTabs active={activeTab} onChange={setActiveTab} showSafety={Boolean(activeGame.safetyTool)} />
+        {screen === 'game' && (
+          <NavTabs active={activeTab} onChange={setActiveTab} showSafety={Boolean(PRIMARY_GAME.safetyTool)} />
         )}
         {screen !== 'game' && <span />}
         <div className="app-shell__header-actions app-region-no-drag">
@@ -106,22 +103,19 @@ export default function App(): React.JSX.Element {
 
       <main className="app-shell__content">
         {ready && (
-          <div key={`${screen}-${activeGameId}-${activeTab}`} className="fade-in">
-            {screen === 'library' && (
-              <LibraryView library={settings.library} onSelectGame={handleSelectGame} />
+          <div key={`${screen}-${activeTab}`} className="fade-in">
+            {screen === 'onboarding' && (
+              <GameOnboarding game={PRIMARY_GAME} onComplete={handleOnboardingComplete} />
             )}
-            {screen === 'onboarding' && activeGame && (
-              <GameOnboarding game={activeGame} onComplete={handleOnboardingComplete} onCancel={openLibrary} />
-            )}
-            {screen === 'game' && activeGame && activeEntry && (
+            {screen === 'game' && activeEntry && (
               <>
                 {activeTab === 'launch' && (
-                  <LaunchView game={activeGame} entry={activeEntry} updateStatus={toolUpdateStatus} />
+                  <LaunchView game={PRIMARY_GAME} entry={activeEntry} updateStatus={toolUpdateStatus} />
                 )}
                 {activeTab === 'setup' && (
-                  <SetupView game={activeGame} entry={activeEntry} onSaved={handleSetupSaved} />
+                  <SetupView game={PRIMARY_GAME} entry={activeEntry} onSaved={handleSetupSaved} />
                 )}
-                {activeTab === 'safety' && activeGame.safetyTool && <SafetyView />}
+                {activeTab === 'safety' && PRIMARY_GAME.safetyTool && <SafetyView />}
               </>
             )}
           </div>
