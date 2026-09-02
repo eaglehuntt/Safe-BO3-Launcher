@@ -3,26 +3,15 @@ import './StatusStepper.css'
 
 type StageStatus = 'pending' | 'active' | 'done' | 'error'
 
-interface Stage {
-  id: string
-  label: string
-}
-
-const STAGES: Stage[] = [
-  { id: 't7', label: 'T7 Patch' },
-  { id: 'confirm', label: 'Confirm' },
-  { id: 'bo3', label: 'Black Ops 3' }
-]
-
 function resolveStatuses(step: LaunchStep | null): StageStatus[] {
   if (!step) return ['pending', 'pending', 'pending']
 
   const order: Record<Exclude<LaunchStep, 'error'>, number> = {
-    'launching-t7': 0,
-    't7-already-running': 0,
-    'waiting-t7': 1,
-    't7-confirmed': 1,
-    'launching-bo3': 2,
+    'launching-tool': 0,
+    'tool-already-running': 0,
+    'waiting-tool': 1,
+    'tool-confirmed': 1,
+    'launching-game': 2,
     done: 3
   }
 
@@ -31,7 +20,7 @@ function resolveStatuses(step: LaunchStep | null): StageStatus[] {
   }
 
   const activeIndex = order[step]
-  return STAGES.map((_, index) => {
+  return [0, 1, 2].map((index) => {
     if (index < activeIndex) return 'done'
     if (index === activeIndex) return step === 'done' ? 'done' : 'active'
     return 'pending'
@@ -40,14 +29,21 @@ function resolveStatuses(step: LaunchStep | null): StageStatus[] {
 
 interface StatusStepperProps {
   step: LaunchStep | null
+  toolLabel: string
+  gameLabel: string
 }
 
-export default function StatusStepper({ step }: StatusStepperProps): React.JSX.Element {
+export default function StatusStepper({ step, toolLabel, gameLabel }: StatusStepperProps): React.JSX.Element {
   const statuses = resolveStatuses(step)
+  const stages = [
+    { id: 'tool', label: toolLabel },
+    { id: 'confirm', label: 'Confirm' },
+    { id: 'game', label: gameLabel }
+  ]
 
   return (
     <div className="stepper">
-      {STAGES.map((stage, index) => (
+      {stages.map((stage, index) => (
         <div className="stepper__stage" key={stage.id}>
           <div className={`stepper__node stepper__node--${statuses[index]}`}>
             {statuses[index] === 'done' && (
@@ -68,7 +64,7 @@ export default function StatusStepper({ step }: StatusStepperProps): React.JSX.E
             {statuses[index] === 'error' && <span className="stepper__error">!</span>}
           </div>
           <span className={`stepper__label stepper__label--${statuses[index]}`}>{stage.label}</span>
-          {index < STAGES.length - 1 && (
+          {index < stages.length - 1 && (
             <div className={`stepper__connector ${statuses[index] === 'done' ? 'is-filled' : ''}`} />
           )}
         </div>

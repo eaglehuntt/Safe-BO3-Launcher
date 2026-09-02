@@ -1,14 +1,20 @@
+export interface LibraryEntry {
+  gameId: string
+  gamePath: string
+  toolPath?: string
+  addedAt: string
+}
+
 export interface LauncherSettings {
-  t7PatchPath: string
-  bo3Path: string
+  library: LibraryEntry[]
 }
 
 export type LaunchStep =
-  | 'launching-t7'
-  | 't7-already-running'
-  | 'waiting-t7'
-  | 't7-confirmed'
-  | 'launching-bo3'
+  | 'launching-tool'
+  | 'tool-already-running'
+  | 'waiting-tool'
+  | 'tool-confirmed'
+  | 'launching-game'
   | 'done'
   | 'error'
 
@@ -33,11 +39,11 @@ export const IPC = {
   GetSettings: 'settings:get',
   SaveSettings: 'settings:save',
   BrowseExe: 'dialog:browseExe',
-  DetectBo3: 'steam:detectBo3',
+  DetectGameInstall: 'steam:detectGameInstall',
   StartLaunch: 'launch:start',
   LaunchProgress: 'launch:progress',
   OpenExternal: 'shell:openExternal',
   GetAppVersion: 'app:getVersion',
-  CheckT7Update: 'update:checkT7',
+  CheckToolUpdate: 'update:checkTool',
   CheckAppUpdate: 'update:checkApp'
 } as const

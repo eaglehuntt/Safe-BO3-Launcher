@@ -8,21 +8,22 @@ interface Tab {
   label: string
 }
 
-const TABS: Tab[] = [
-  { id: 'launch', label: 'Launch' },
-  { id: 'setup', label: 'Setup' },
-  { id: 'safety', label: 'Safety Guide' }
-]
-
 interface NavTabsProps {
   active: ViewId
   onChange: (id: ViewId) => void
+  showSafety: boolean
 }
 
-export default function NavTabs({ active, onChange }: NavTabsProps): React.JSX.Element {
+export default function NavTabs({ active, onChange, showSafety }: NavTabsProps): React.JSX.Element {
+  const tabs: Tab[] = [
+    { id: 'launch', label: 'Launch' },
+    { id: 'setup', label: 'Setup' },
+    ...(showSafety ? [{ id: 'safety' as const, label: 'Safety Guide' }] : [])
+  ]
+
   return (
     <nav className="nav-tabs app-region-no-drag">
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <button
           key={tab.id}
           className={`nav-tabs__item ${active === tab.id ? 'is-active' : ''}`}

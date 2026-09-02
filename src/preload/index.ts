@@ -16,15 +16,18 @@ const api = {
   browseForExe: (title: string): Promise<string | null> =>
     ipcRenderer.invoke(IPC.BrowseExe, title),
 
-  detectBlackOps3: (): Promise<string | null> => ipcRenderer.invoke(IPC.DetectBo3),
+  detectGameInstall: (steamAppId: number, exeFileName: string): Promise<string | null> =>
+    ipcRenderer.invoke(IPC.DetectGameInstall, steamAppId, exeFileName),
 
-  startLaunch: (): Promise<LaunchResult> => ipcRenderer.invoke(IPC.StartLaunch),
+  startLaunch: (gameId: string): Promise<LaunchResult> =>
+    ipcRenderer.invoke(IPC.StartLaunch, gameId),
 
   openExternal: (url: string): Promise<void> => ipcRenderer.invoke(IPC.OpenExternal, url),
 
   getAppVersion: (): Promise<string> => ipcRenderer.invoke(IPC.GetAppVersion),
 
-  checkT7Update: (): Promise<UpdateStatus> => ipcRenderer.invoke(IPC.CheckT7Update),
+  checkToolUpdate: (toolPath: string, repoUrl: string): Promise<UpdateStatus> =>
+    ipcRenderer.invoke(IPC.CheckToolUpdate, toolPath, repoUrl),
 
   checkAppUpdate: (): Promise<UpdateStatus> => ipcRenderer.invoke(IPC.CheckAppUpdate),
 

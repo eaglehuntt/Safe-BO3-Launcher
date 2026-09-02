@@ -1,8 +1,8 @@
 {
-  "name": "safe-bo3-launcher",
-  "productName": "Safe BO3 Launcher",
+  "name": "gamesafe-launcher",
+  "productName": "GameSafe Launcher",
   "version": "2.0.0",
-  "description": "Launches the T7 patch and confirms it's running before starting Black Ops 3.",
+  "description": "Launches older online games' community safety patches and confirms they're running before starting the game.",
   "author": "eaglehuntt",
   "homepage": "https://github.com/eaglehuntt/Safe-BO3-Launcher",
   "main": "./out/main/index.js",
@@ -32,8 +32,8 @@
     "vite": "^6.0.11"
   },
   "build": {
-    "appId": "com.eaglehuntt.safebo3launcher",
-    "productName": "Safe BO3 Launcher",
+    "appId": "com.eaglehuntt.gamesafelauncher",
+    "productName": "GameSafe Launcher",
     "directories": {
       "output": "release"
     },

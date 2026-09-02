@@ -15,8 +15,20 @@
 }
 
 .titlebar__mark {
+  position: relative;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
   filter: drop-shadow(0 0 6px rgba(255, 122, 61, 0.5));
+  transition: background-color 0.15s ease;
+}
+
+.titlebar__mark:hover {
+  background: rgba(255, 122, 61, 0.14);
 }
 
 .titlebar__title {

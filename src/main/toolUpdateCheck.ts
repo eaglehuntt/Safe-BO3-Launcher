@@ -1,12 +1,8 @@
 import { stat } from 'fs/promises'
 import { fetchFirstAtomEntry } from './atomFeed'
 
-const RELEASES_ATOM_URL = 'https://github.com/Scroptss/T7Patch/releases.atom'
-const COMMITS_ATOM_URL = 'https://github.com/Scroptss/T7Patch/commits.atom'
-const RELEASES_PAGE_URL = 'https://github.com/Scroptss/T7Patch/releases'
-
 /**
- * Compares the T7 patch executable's modification time against the T7Patch
+ * Compares a safety tool's executable modification time against its GitHub
  * repo's most recent release (or, if it has no releases, its most recent
  * commit) to guess whether a newer build is available. Reading the repo's
  * Atom feed (github.com/.../releases.atom) avoids the GitHub REST API's
@@ -15,27 +11,34 @@ const RELEASES_PAGE_URL = 'https://github.com/Scroptss/T7Patch/releases'
  * we can read, so "newer than what you downloaded" is the best signal
  * available.
  */
-export async function checkT7Update(
-  t7PatchPath: string
+export async function checkToolUpdate(
+  toolPath: string,
+  repoUrl: string
 ): Promise<{ updateAvailable: boolean; latestLabel: string | null; releaseUrl: string }> {
+  const releasesPageUrl = `${repoUrl.replace(/\/$/, '')}/releases`
+
   let localModifiedAt: Date
   try {
-    const stats = await stat(t7PatchPath)
+    const stats = await stat(toolPath)
     localModifiedAt = stats.mtime
   } catch {
-    return { updateAvailable: false, latestLabel: null, releaseUrl: RELEASES_PAGE_URL }
+    return { updateAvailable: false, latestLabel: null, releaseUrl: releasesPageUrl }
   }
 
-  const latestEntry = (await fetchFirstAtomEntry(RELEASES_ATOM_URL)) ?? (await fetchFirstAtomEntry(COMMITS_ATOM_URL))
+  const releasesAtomUrl = `${repoUrl.replace(/\/$/, '')}/releases.atom`
+  const commitsAtomUrl = `${repoUrl.replace(/\/$/, '')}/commits.atom`
+
+  const latestEntry =
+    (await fetchFirstAtomEntry(releasesAtomUrl)) ?? (await fetchFirstAtomEntry(commitsAtomUrl))
 
   if (!latestEntry) {
-    return { updateAvailable: false, latestLabel: null, releaseUrl: RELEASES_PAGE_URL }
+    return { updateAvailable: false, latestLabel: null, releaseUrl: releasesPageUrl }
   }
 
   const updatedAt = new Date(latestEntry.updated)
   return {
     updateAvailable: updatedAt.getTime() > localModifiedAt.getTime(),
     latestLabel: latestEntry.title,
-    releaseUrl: latestEntry.url || RELEASES_PAGE_URL
+    releaseUrl: latestEntry.url || releasesPageUrl
   }
 }

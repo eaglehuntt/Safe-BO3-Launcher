@@ -1,15 +1,10 @@
 import { app } from 'electron'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-
-export interface LauncherSettings {
-  t7PatchPath: string
-  bo3Path: string
-}
+import type { LauncherSettings } from '../shared/types'
 
 const DEFAULT_SETTINGS: LauncherSettings = {
-  t7PatchPath: '',
-  bo3Path: ''
+  library: []
 }
 
 function getConfigPath(): string {
@@ -24,6 +19,10 @@ export function loadSettings(): LauncherSettings {
   try {
     const raw = readFileSync(configPath, 'utf-8')
     const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed.library)) {
+      // Older settings shape (pre-library) or corrupt file: start fresh rather than crash.
+      return { ...DEFAULT_SETTINGS }
+    }
     return { ...DEFAULT_SETTINGS, ...parsed }
   } catch {
     return { ...DEFAULT_SETTINGS }

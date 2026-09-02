@@ -2,10 +2,11 @@ import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import { IPC } from '../shared/types'
 import type { LauncherSettings } from '../shared/types'
+import { getGameDefinition } from '../shared/gameDefinitions'
 import { runLaunchSequence } from './launchSequence'
 import { loadSettings, saveSettings } from './settings'
-import { detectBlackOps3Path } from './steamDetect'
-import { checkT7Update } from './t7UpdateCheck'
+import { detectGameInstallPath } from './steamDetect'
+import { checkToolUpdate } from './toolUpdateCheck'
 import { checkAppUpdate } from './appUpdateCheck'
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
@@ -100,12 +101,21 @@ function registerIpcHandlers(): void {
     return result.filePaths[0]
   })
 
-  ipcMain.handle(IPC.DetectBo3, () => detectBlackOps3Path())
+  ipcMain.handle(IPC.DetectGameInstall, (_event, steamAppId: number, exeFileName: string) =>
+    detectGameInstallPath(steamAppId, exeFileName)
+  )
 
-  ipcMain.handle(IPC.StartLaunch, async () => {
+  ipcMain.handle(IPC.StartLaunch, async (_event, gameId: string) => {
     if (!mainWindow) return { success: false, message: 'Window not ready.' }
+
+    const game = getGameDefinition(gameId)
+    if (!game) return { success: false, message: 'Unknown game.' }
+
     const settings = loadSettings()
-    return runLaunchSequence(mainWindow, settings)
+    const entry = settings.library.find((item) => item.gameId === gameId)
+    if (!entry) return { success: false, message: 'That game isn’t set up yet.' }
+
+    return runLaunchSequence(mainWindow, game, entry.gamePath, entry.toolPath)
   })
 
   ipcMain.handle(IPC.OpenExternal, (_event, url: string) => {
@@ -116,13 +126,9 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC.GetAppVersion, () => app.getVersion())
 
-  ipcMain.handle(IPC.CheckT7Update, () => {
-    const settings = loadSettings()
-    if (!settings.t7PatchPath) {
-      return { updateAvailable: false, latestLabel: null, releaseUrl: '' }
-    }
-    return checkT7Update(settings.t7PatchPath)
-  })
+  ipcMain.handle(IPC.CheckToolUpdate, (_event, toolPath: string, repoUrl: string) =>
+    checkToolUpdate(toolPath, repoUrl)
+  )
 
   ipcMain.handle(IPC.CheckAppUpdate, () => checkAppUpdate(app.getVersion()))
 }
