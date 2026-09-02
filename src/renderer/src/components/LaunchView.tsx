@@ -63,15 +63,15 @@ export default function LaunchView({ game, entry, updateStatus }: LaunchViewProp
   return (
     <div className="launch-view">
       <div className="launch-view__hero fade-in">
-        <CoverArt steamAppId={game.steamAppId} alt="" variant="hero" className="launch-view__hero-art" />
-        <div className="launch-view__hero-overlay" />
-        <div className="launch-view__hero-content">
-          <span className="launch-view__big">{game.shortLabel}</span>
-          <span className="launch-view__full">{game.name}</span>
-          <p className="launch-view__tagline">
-            {game.safetyTool ? 'Patch first, then deploy.' : 'Ready when you are.'}
-          </p>
-        </div>
+        <CoverArt steamAppId={game.steamAppId} alt={game.name} variant="hero" className="launch-view__hero-art" />
+      </div>
+
+      <div className="launch-view__title-block fade-in">
+        <span className="launch-view__big">{game.shortLabel}</span>
+        <span className="launch-view__full">{game.name}</span>
+        <p className="launch-view__tagline">
+          {game.safetyTool ? 'Patch first, then deploy.' : 'Ready when you are.'}
+        </p>
       </div>
 
       <div className="launch-view__card fade-in">
