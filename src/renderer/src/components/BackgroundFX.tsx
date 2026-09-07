@@ -21,7 +21,8 @@ function makeEmbers(count: number): Ember[] {
   }))
 }
 
-const STREAKS = [8, 18, 27, 63, 74, 86, 92]
+const STREAK_COUNT = 7
+const STREAKS = Array.from({ length: STREAK_COUNT }, (_, i) => ((i + 1) / (STREAK_COUNT + 1)) * 100)
 
 export default function BackgroundFX(): React.JSX.Element {
   const embers = useMemo(() => makeEmbers(24), [])

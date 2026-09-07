@@ -3,10 +3,22 @@ export interface LibraryEntry {
   gamePath: string
   toolPath?: string
   addedAt: string
+  /** When the user last browsed to/confirmed toolPath, used as the update-check baseline since file mtimes aren't reliable. */
+  toolPathUpdatedAt?: string
 }
+
+/** Which top-level screen the user was last looking at, so we can reopen it there. */
+export type AppView = 'play' | 'info'
 
 export interface LauncherSettings {
   library: LibraryEntry[]
+  lastView?: AppView
+}
+
+export interface AtomFeedEntry {
+  title: string
+  updated: string
+  url: string
 }
 
 export type LaunchStep =
@@ -38,6 +50,7 @@ export interface UpdateStatus {
 export const IPC = {
   GetSettings: 'settings:get',
   SaveSettings: 'settings:save',
+  ResetSettings: 'settings:reset',
   BrowseExe: 'dialog:browseExe',
   DetectGameInstall: 'steam:detectGameInstall',
   StartLaunch: 'launch:start',
@@ -46,5 +59,6 @@ export const IPC = {
   GetAppVersion: 'app:getVersion',
   CheckToolUpdate: 'update:checkTool',
   CheckAppUpdate: 'update:checkApp',
-  IsProcessRunning: 'process:isRunning'
+  IsProcessRunning: 'process:isRunning',
+  FetchFeed: 'feed:fetch'
 } as const

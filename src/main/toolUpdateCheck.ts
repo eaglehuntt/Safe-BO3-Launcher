@@ -1,27 +1,27 @@
-import { stat } from 'fs/promises'
 import { fetchFirstAtomEntry } from './atomFeed'
 
 /**
- * Compares a safety tool's executable modification time against its GitHub
- * repo's most recent release (or, if it has no releases, its most recent
- * commit) to guess whether a newer build is available. Reading the repo's
- * Atom feed (github.com/.../releases.atom) avoids the GitHub REST API's
- * stricter unauthenticated rate limits. This is a heuristic, not an exact
- * version comparison: the installed exe has no reliable version metadata
- * we can read, so "newer than what you downloaded" is the best signal
- * available.
+ * Compares when the user pointed the launcher at this safety tool's
+ * executable against its GitHub repo's most recent release (or, if it has
+ * no releases, its most recent commit) to guess whether a newer build is
+ * available. Reading the repo's Atom feed (github.com/.../releases.atom)
+ * avoids the GitHub REST API's stricter unauthenticated rate limits.
+ *
+ * This used to compare the exe's filesystem modification time instead, but
+ * that's unreliable: extracting or copying the file resets its mtime to
+ * "now", which is always newer than any past release and made the check
+ * permanently report "up to date" regardless of the actual version
+ * installed. The launcher-recorded timestamp (set when the user last
+ * browsed to or confirmed this path) is the best signal available, since
+ * the exe itself carries no reliable version metadata we can read.
  */
 export async function checkToolUpdate(
-  toolPath: string,
+  installedAt: string | undefined,
   repoUrl: string
 ): Promise<{ updateAvailable: boolean; latestLabel: string | null; releaseUrl: string }> {
   const releasesPageUrl = `${repoUrl.replace(/\/$/, '')}/releases`
 
-  let localModifiedAt: Date
-  try {
-    const stats = await stat(toolPath)
-    localModifiedAt = stats.mtime
-  } catch {
+  if (!installedAt) {
     return { updateAvailable: false, latestLabel: null, releaseUrl: releasesPageUrl }
   }
 
@@ -36,8 +36,9 @@ export async function checkToolUpdate(
   }
 
   const updatedAt = new Date(latestEntry.updated)
+  const installedAtDate = new Date(installedAt)
   return {
-    updateAvailable: updatedAt.getTime() > localModifiedAt.getTime(),
+    updateAvailable: updatedAt.getTime() > installedAtDate.getTime(),
     latestLabel: latestEntry.title,
     releaseUrl: latestEntry.url || releasesPageUrl
   }

@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
-import type { LauncherSettings, LibraryEntry, UpdateStatus } from '@shared/types'
+import type { AppView, LauncherSettings, LibraryEntry, UpdateStatus } from '@shared/types'
 import { GAME_CATALOG } from '@shared/gameDefinitions'
 import BackgroundFX from './components/BackgroundFX'
 import Button from './components/Button'
 import GameOnboarding from './components/GameOnboarding'
-import LaunchView from './components/LaunchView'
-import NavTabs, { type ViewId } from './components/NavTabs'
-import SafetyView from './components/SafetyView'
-import SetupView from './components/SetupView'
+import InfoView from './components/InfoView'
+import PlayView from './components/PlayView'
+import type { ViewId } from './components/NavTabs'
 import TitleBar from './components/TitleBar'
 import './App.css'
 
@@ -23,7 +22,8 @@ type Screen = 'game' | 'onboarding'
 
 export default function App(): React.JSX.Element {
   const [screen, setScreen] = useState<Screen>('onboarding')
-  const [activeTab, setActiveTab] = useState<ViewId>('launch')
+  const [view, setView] = useState<AppView>('info')
+  const [activeTab, setActiveTab] = useState<ViewId>('home')
   const [settings, setSettings] = useState<LauncherSettings>(EMPTY_SETTINGS)
   const [version, setVersion] = useState('2.0.0')
   const [ready, setReady] = useState(false)
@@ -38,54 +38,99 @@ export default function App(): React.JSX.Element {
         setReady(true)
         const entry = loadedSettings.library.find((item) => item.gameId === PRIMARY_GAME.id)
         setScreen(entry?.gamePath ? 'game' : 'onboarding')
-        window.api.checkAppUpdate().then(setAppUpdateStatus)
+        setView(loadedSettings.lastView ?? 'info')
       }
     )
   }, [])
 
   const activeEntry = settings.library.find((item) => item.gameId === PRIMARY_GAME.id) ?? null
 
-  useEffect(() => {
-    if (!activeEntry || !PRIMARY_GAME.safetyTool || !activeEntry.toolPath) {
+  // Re-checks are cheap: the main process caches each feed URL for a few
+  // minutes, so calling this on most navigation clicks (plus a background
+  // timer) keeps the "update available" banners fresh without hammering
+  // GitHub on every click.
+  function refreshUpdateChecks(): void {
+    window.api.checkAppUpdate().then(setAppUpdateStatus)
+    if (activeEntry && PRIMARY_GAME.safetyTool && activeEntry.toolPath) {
+      const installedAt = activeEntry.toolPathUpdatedAt ?? activeEntry.addedAt
+      window.api.checkToolUpdate(installedAt, PRIMARY_GAME.safetyTool.repoUrl).then(setToolUpdateStatus)
+    } else {
       setToolUpdateStatus(null)
-      return
     }
-    window.api.checkToolUpdate(activeEntry.toolPath, PRIMARY_GAME.safetyTool.repoUrl).then(setToolUpdateStatus)
+  }
+
+  useEffect(() => {
+    if (!ready) return
+    refreshUpdateChecks()
+    const interval = setInterval(refreshUpdateChecks, 3 * 60 * 1000)
+    return () => clearInterval(interval)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeEntry?.toolPath])
+  }, [ready, activeEntry?.toolPath, activeEntry?.toolPathUpdatedAt])
 
   async function persistLibrary(library: LibraryEntry[]): Promise<void> {
     const saved = await window.api.saveSettings({ ...settings, library })
     setSettings(saved)
   }
 
+  async function switchView(next: AppView): Promise<void> {
+    if (next === view) return
+    setView(next)
+    refreshUpdateChecks()
+    const saved = await window.api.saveSettings({ ...settings, lastView: next })
+    setSettings(saved)
+  }
+
   async function handleOnboardingComplete(gamePath: string, toolPath?: string): Promise<void> {
+    const now = new Date().toISOString()
     const entry: LibraryEntry = {
       gameId: PRIMARY_GAME.id,
       gamePath,
       toolPath,
-      addedAt: new Date().toISOString()
+      addedAt: now,
+      toolPathUpdatedAt: toolPath ? now : undefined
     }
     const withoutExisting = settings.library.filter((item) => item.gameId !== PRIMARY_GAME.id)
-    await persistLibrary([...withoutExisting, entry])
-    setActiveTab('launch')
+    const nextSettings = { ...settings, library: [...withoutExisting, entry], lastView: 'info' as const }
+    const saved = await window.api.saveSettings(nextSettings)
+    setSettings(saved)
+    setView('info')
+    setActiveTab('home')
     setScreen('game')
   }
 
   async function handleSetupSaved(entry: LibraryEntry): Promise<void> {
-    const nextLibrary = settings.library.map((item) => (item.gameId === entry.gameId ? entry : item))
+    const previous = settings.library.find((item) => item.gameId === entry.gameId)
+    const toolPathChanged = entry.toolPath && entry.toolPath !== previous?.toolPath
+    const nextEntry: LibraryEntry = {
+      ...entry,
+      toolPathUpdatedAt: toolPathChanged ? new Date().toISOString() : previous?.toolPathUpdatedAt
+    }
+    const nextLibrary = settings.library.map((item) => (item.gameId === nextEntry.gameId ? nextEntry : item))
     await persistLibrary(nextLibrary)
+  }
+
+  async function handleResetToFactory(): Promise<void> {
+    const reset = await window.api.resetSettings()
+    setSettings(reset)
+    setToolUpdateStatus(null)
+    setView('info')
+    setActiveTab('home')
+    setScreen('onboarding')
   }
 
   return (
     <div className="app-shell">
       <BackgroundFX />
-      <TitleBar version={version} onOpenLibrary={() => setActiveTab('launch')} />
+      <TitleBar
+        version={version}
+        onOpenLibrary={() => {
+          const next = view === 'play' ? 'info' : 'play'
+          if (next === 'info') setActiveTab('home')
+          switchView(next)
+        }}
+      />
       <header className="app-shell__header app-region-drag">
-        {screen === 'game' && (
-          <NavTabs active={activeTab} onChange={setActiveTab} showSafety={Boolean(PRIMARY_GAME.safetyTool)} />
-        )}
-        {screen !== 'game' && <span />}
+        <span />
         <div className="app-shell__header-actions app-region-no-drag">
           {appUpdateStatus?.updateAvailable && (
             <button
@@ -103,22 +148,38 @@ export default function App(): React.JSX.Element {
 
       <main className="app-shell__content">
         {ready && (
-          <div key={`${screen}-${activeTab}`} className="fade-in">
+          <>
             {screen === 'onboarding' && (
-              <GameOnboarding game={PRIMARY_GAME} onComplete={handleOnboardingComplete} />
+              <div className="fade-in">
+                <GameOnboarding game={PRIMARY_GAME} onComplete={handleOnboardingComplete} />
+              </div>
             )}
             {screen === 'game' && activeEntry && (
-              <>
-                {activeTab === 'launch' && (
-                  <LaunchView game={PRIMARY_GAME} entry={activeEntry} updateStatus={toolUpdateStatus} />
+              <div key={view} className="view-shell fade-in">
+                {view === 'play' ? (
+                  <PlayView
+                    game={PRIMARY_GAME}
+                    entry={activeEntry}
+                    updateStatus={toolUpdateStatus}
+                    onOpenInfo={() => switchView('info')}
+                  />
+                ) : (
+                  <InfoView
+                    game={PRIMARY_GAME}
+                    entry={activeEntry}
+                    activeTab={activeTab}
+                    onTabChange={(tab) => {
+                      setActiveTab(tab)
+                      refreshUpdateChecks()
+                    }}
+                    onSaved={handleSetupSaved}
+                    onResetToFactory={handleResetToFactory}
+                    onOpenPlay={() => switchView('play')}
+                  />
                 )}
-                {activeTab === 'setup' && (
-                  <SetupView game={PRIMARY_GAME} entry={activeEntry} onSaved={handleSetupSaved} />
-                )}
-                {activeTab === 'safety' && PRIMARY_GAME.safetyTool && <SafetyView />}
-              </>
+              </div>
             )}
-          </div>
+          </>
         )}
       </main>
     </div>

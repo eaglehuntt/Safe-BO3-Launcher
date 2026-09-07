@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import './NavTabs.css'
 
-export type ViewId = 'launch' | 'setup' | 'safety'
+export type ViewId = 'home' | 'setup' | 'safety'
 
 interface Tab {
   id: ViewId
@@ -16,7 +16,7 @@ interface NavTabsProps {
 
 export default function NavTabs({ active, onChange, showSafety }: NavTabsProps): React.JSX.Element {
   const tabs: Tab[] = [
-    { id: 'launch', label: 'Launch' },
+    { id: 'home', label: 'Home' },
     { id: 'setup', label: 'Setup' },
     ...(showSafety ? [{ id: 'safety' as const, label: 'Safety Guide' }] : [])
   ]

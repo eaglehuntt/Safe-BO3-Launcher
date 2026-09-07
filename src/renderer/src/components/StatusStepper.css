@@ -10,11 +10,15 @@
   display: flex;
   align-items: center;
   flex: 1;
-  position: relative;
 }
 
 .stepper__stage:last-child {
   flex: 0;
+}
+
+.stepper__node-wrap {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .stepper__node {
@@ -34,6 +38,7 @@
 .stepper__node--done {
   background: var(--gradient-brand);
   border-color: transparent;
+  animation: stepper-done-flash 0.6s ease-out;
 }
 
 .stepper__node--active {
@@ -47,17 +52,54 @@
 }
 
 .stepper__pulse {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--accent-orange);
-  animation: glow-pulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(255, 122, 61, 0.8);
+}
+
+.stepper__ping {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-orange);
+  opacity: 0;
+  pointer-events: none;
+  animation: stepper-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.stepper__ping--delay {
+  animation-delay: 0.9s;
+}
+
+@keyframes stepper-ping {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes stepper-done-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 122, 61, 0.6);
+  }
+  60% {
+    box-shadow: 0 0 0 10px rgba(255, 122, 61, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 122, 61, 0);
+  }
 }
 
 .stepper__check {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: check-draw 0.4s ease-out forwards;
+  animation: check-draw 0.4s ease-out 0.1s forwards;
 }
 
 @keyframes check-draw {
@@ -77,22 +119,14 @@
   top: 38px;
   left: 50%;
   transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 11px;
   font-family: var(--font-display);
   letter-spacing: 0.04em;
   white-space: nowrap;
   color: var(--text-tertiary);
-}
-
-.stepper__stage:last-child .stepper__label {
-  left: auto;
-  transform: none;
-  right: 0;
-}
-
-.stepper__stage:first-child .stepper__label {
-  left: 0;
-  transform: none;
 }
 
 .stepper__label--done,

@@ -5,6 +5,8 @@ export interface SafetyToolDefinition {
   instructions: string[]
 }
 
+export const LAUNCHER_REPO_URL = 'https://github.com/eaglehuntt/Safe-BO3-Launcher'
+
 export interface GameDefinition {
   id: string
   name: string

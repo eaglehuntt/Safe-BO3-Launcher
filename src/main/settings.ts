@@ -33,3 +33,7 @@ export function saveSettings(settings: LauncherSettings): LauncherSettings {
   writeFileSync(getConfigPath(), JSON.stringify(settings, null, 2), 'utf-8')
   return settings
 }
+
+export function resetSettings(): LauncherSettings {
+  return saveSettings({ ...DEFAULT_SETTINGS })
+}

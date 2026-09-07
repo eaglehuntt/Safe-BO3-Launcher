@@ -44,5 +44,22 @@
 
 .app-shell__content {
   flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
+  /*
+   * Reserves the scrollbar's width always, whether or not it's actually
+   * needed. Without this, switching between a view that scrolls and one
+   * that doesn't changes the available content width, so everything
+   * horizontally centered visibly shifts sideways on every view switch.
+   */
+  scrollbar-gutter: stable;
+}
+
+.view-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }

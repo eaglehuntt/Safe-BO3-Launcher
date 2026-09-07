@@ -4,11 +4,12 @@ import { IPC } from '../shared/types'
 import type { LauncherSettings } from '../shared/types'
 import { getGameDefinition } from '../shared/gameDefinitions'
 import { runLaunchSequence } from './launchSequence'
-import { loadSettings, saveSettings } from './settings'
+import { loadSettings, saveSettings, resetSettings } from './settings'
 import { detectGameInstallPath } from './steamDetect'
 import { isProcessRunning } from './processUtils'
 import { checkToolUpdate } from './toolUpdateCheck'
 import { checkAppUpdate } from './appUpdateCheck'
+import { fetchAtomEntries } from './atomFeed'
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
 if (!gotSingleInstanceLock) {
@@ -30,10 +31,17 @@ function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1180,
     height: 760,
-    resizable: false,
-    maximizable: false,
+    minWidth: 1080,
+    minHeight: 640,
+    // Taller than this and the info panel's fixed-height composition (sized
+    // to the cover art's own max size) stops filling the window, leaving a
+    // dead gap below it instead of scaling further.
+    maxHeight: 900,
+    resizable: true,
+    maximizable: true,
     show: false,
     autoHideMenuBar: true,
+    icon: join(__dirname, '../../build/icon.ico'),
     backgroundColor: '#0a0908',
     titleBarStyle: 'hidden',
     titleBarOverlay: {
@@ -88,6 +96,8 @@ function registerIpcHandlers(): void {
     saveSettings(settings)
   )
 
+  ipcMain.handle(IPC.ResetSettings, () => resetSettings())
+
   ipcMain.handle(IPC.BrowseExe, async (_event, title: string) => {
     if (!mainWindow) return null
     const result = await dialog.showOpenDialog(mainWindow, {
@@ -127,13 +137,15 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC.GetAppVersion, () => app.getVersion())
 
-  ipcMain.handle(IPC.CheckToolUpdate, (_event, toolPath: string, repoUrl: string) =>
-    checkToolUpdate(toolPath, repoUrl)
+  ipcMain.handle(IPC.CheckToolUpdate, (_event, installedAt: string | undefined, repoUrl: string) =>
+    checkToolUpdate(installedAt, repoUrl)
   )
 
   ipcMain.handle(IPC.CheckAppUpdate, () => checkAppUpdate(app.getVersion()))
 
   ipcMain.handle(IPC.IsProcessRunning, (_event, exePath: string) => isProcessRunning(exePath))
+
+  ipcMain.handle(IPC.FetchFeed, (_event, url: string, limit?: number) => fetchAtomEntries(url, limit))
 }
 
 app.whenReady().then(() => {

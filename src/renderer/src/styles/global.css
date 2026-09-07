@@ -19,9 +19,9 @@
   --gradient-panel: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
 
   --shadow-glow: 0 0 40px rgba(255, 122, 61, 0.25);
-  --radius-lg: 18px;
-  --radius-md: 12px;
-  --radius-sm: 8px;
+  --radius-lg: 10px;
+  --radius-md: 7px;
+  --radius-sm: 5px;
 
   --font-display: 'Bahnschrift', 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;

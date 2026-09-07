@@ -50,62 +50,71 @@ export default function GameSetupForm({
 
   return (
     <div className="game-setup-form">
-      <div className="game-setup-form__field">
-        <label className="game-setup-form__label">{game.name} executable</label>
-        <div className="game-setup-form__row">
-          <input
-            className="game-setup-form__input"
-            type="text"
-            readOnly
-            value={gamePath}
-            placeholder="No file selected"
-          />
-          <Button variant="outline" onClick={browseGame}>
-            Browse
-          </Button>
-        </div>
-        <div className="game-setup-form__detect-row">
-          <Button variant="ghost" onClick={detectGame} disabled={detectStatus === 'detecting'}>
-            {detectStatus === 'detecting' ? 'Searching Steam libraries...' : 'Auto-detect via Steam'}
-          </Button>
-          {detectStatus === 'found' && <span className="game-setup-form__detect-msg is-good">Found</span>}
-          {detectStatus === 'not-found' && (
-            <span className="game-setup-form__detect-msg is-bad">
-              Couldn&apos;t find it automatically, browse manually above.
-            </span>
-          )}
-        </div>
-      </div>
-
-      {game.safetyTool && (
+      <div className="game-setup-form__field-pair">
         <div className="game-setup-form__field">
-          <label className="game-setup-form__label">{game.safetyTool.label} executable</label>
+          <label className="game-setup-form__label">{game.name} executable</label>
           <div className="game-setup-form__row">
             <input
               className="game-setup-form__input"
               type="text"
               readOnly
-              value={toolPath}
+              value={gamePath}
               placeholder="No file selected"
             />
-            <Button variant="outline" onClick={browseTool}>
+            <Button variant="outline" onClick={browseGame}>
               Browse
             </Button>
           </div>
+          <div className="game-setup-form__detect-row">
+            <Button variant="ghost" onClick={detectGame} disabled={detectStatus === 'detecting'}>
+              {detectStatus === 'detecting' ? 'Searching Steam libraries...' : 'Auto-detect via Steam'}
+            </Button>
+            {detectStatus === 'found' && <span className="game-setup-form__detect-msg is-good">Found</span>}
+            {detectStatus === 'not-found' && (
+              <span className="game-setup-form__detect-msg is-bad">Not found, browse manually.</span>
+            )}
+          </div>
+        </div>
+
+        {game.safetyTool && (
+          <div className="game-setup-form__field">
+            <label className="game-setup-form__label">{game.safetyTool.label} executable</label>
+            <div className="game-setup-form__row">
+              <input
+                className="game-setup-form__input"
+                type="text"
+                readOnly
+                value={toolPath}
+                placeholder="No file selected"
+              />
+              <Button variant="outline" onClick={browseTool}>
+                Browse
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {game.safetyTool && (
+        <div className="game-setup-form__tool-help">
           <ol className="game-setup-form__steps">
             {game.safetyTool.instructions.map((step) => (
               <li key={step}>{step}</li>
             ))}
           </ol>
-          <Button variant="outline" onClick={() => window.api.openExternal(game.safetyTool!.repoUrl)}>
-            Open the {game.safetyTool.label} repo ↗
-          </Button>
         </div>
       )}
 
-      <Button onClick={() => onSave(gamePath, game.safetyTool ? toolPath : undefined)} disabled={!canSave}>
-        {saveLabel}
-      </Button>
+      <div className="game-setup-form__actions">
+        {game.safetyTool && (
+          <Button variant="outline" onClick={() => window.api.openExternal(game.safetyTool!.repoUrl)}>
+            Open the {game.safetyTool.label} repo ↗
+          </Button>
+        )}
+        <Button onClick={() => onSave(gamePath, game.safetyTool ? toolPath : undefined)} disabled={!canSave}>
+          {saveLabel}
+        </Button>
+      </div>
     </div>
   )
 }

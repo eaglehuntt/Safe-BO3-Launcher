@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC } from '../shared/types'
 import type {
+  AtomFeedEntry,
   LaunchProgressEvent,
   LaunchResult,
   LauncherSettings,
@@ -12,6 +13,8 @@ const api = {
 
   saveSettings: (settings: LauncherSettings): Promise<LauncherSettings> =>
     ipcRenderer.invoke(IPC.SaveSettings, settings),
+
+  resetSettings: (): Promise<LauncherSettings> => ipcRenderer.invoke(IPC.ResetSettings),
 
   browseForExe: (title: string): Promise<string | null> =>
     ipcRenderer.invoke(IPC.BrowseExe, title),
@@ -26,13 +29,16 @@ const api = {
 
   getAppVersion: (): Promise<string> => ipcRenderer.invoke(IPC.GetAppVersion),
 
-  checkToolUpdate: (toolPath: string, repoUrl: string): Promise<UpdateStatus> =>
-    ipcRenderer.invoke(IPC.CheckToolUpdate, toolPath, repoUrl),
+  checkToolUpdate: (installedAt: string | undefined, repoUrl: string): Promise<UpdateStatus> =>
+    ipcRenderer.invoke(IPC.CheckToolUpdate, installedAt, repoUrl),
 
   checkAppUpdate: (): Promise<UpdateStatus> => ipcRenderer.invoke(IPC.CheckAppUpdate),
 
   isProcessRunning: (exePath: string): Promise<boolean> =>
     ipcRenderer.invoke(IPC.IsProcessRunning, exePath),
+
+  fetchFeed: (url: string, limit?: number): Promise<AtomFeedEntry[]> =>
+    ipcRenderer.invoke(IPC.FetchFeed, url, limit),
 
   onLaunchProgress: (callback: (event: LaunchProgressEvent) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, payload: LaunchProgressEvent): void =>
