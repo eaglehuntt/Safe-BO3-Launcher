@@ -1,0 +1,64 @@
+.info-view {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px 32px 32px;
+  min-height: 0;
+}
+
+.info-view__side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: clamp(250px, 35%, 400px);
+  flex-shrink: 0;
+}
+
+.info-view__side .info-view__cover-art {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+.info-view__play-btn {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--gradient-brand);
+  color: #140b06;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.info-view__main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--gradient-panel), var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.info-view__main .nav-tabs {
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.info-view__content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}

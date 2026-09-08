@@ -1,0 +1,87 @@
+.game-setup-form {
+  position: relative;
+}
+
+.game-setup-form__field-pair {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.game-setup-form__field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.game-setup-form__tool-help {
+  margin-bottom: 18px;
+}
+
+.game-setup-form__actions {
+  display: flex;
+  gap: 14px;
+}
+
+.game-setup-form__label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+.game-setup-form__row {
+  display: flex;
+  gap: 12px;
+}
+
+.game-setup-form__input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-panel-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.game-setup-form__input:focus {
+  outline: none;
+  border-color: var(--border-strong);
+}
+
+.game-setup-form__detect-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.game-setup-form__detect-msg {
+  font-size: 12px;
+}
+
+.game-setup-form__detect-msg.is-good {
+  color: var(--accent-amber);
+}
+
+.game-setup-form__detect-msg.is-bad {
+  color: var(--text-tertiary);
+}
+
+.game-setup-form__steps {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.game-setup-form__steps li::marker {
+  color: var(--accent-orange);
+  font-family: var(--font-mono);
+}
